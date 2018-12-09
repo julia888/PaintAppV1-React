@@ -14,17 +14,22 @@ class Controls extends Component {
             figure: 'rectangle',
             pen: false,
             coordinates: [0,0]
-        }
+        };
+        this.state.size = localStorage.getItem('Size');
+        this.state.figure = localStorage.getItem('Figure');
+        this.state.color = localStorage.getItem('Color');
     }
     changeSize = (e) => {
         this.setState({
             size: e.target.value
-        })
+        });
+        localStorage.setItem('Size', e.target.value);
     };
     changeFigure = (e) => {
         this.setState({
             figure: e.target.value
-        })
+        });
+        localStorage.setItem('Figure', e.target.value);
     };
     changeColor = (e) => {
         if (e.key === 'Enter') {
@@ -32,12 +37,13 @@ class Controls extends Component {
                 color: e.target.value
             });
         }
+        localStorage.setItem('Color', e.target.value);
     };
     changePenState = () => {
         if (this.state.pen === false){
             this.setState({
                 pen: true
-            })
+            });
         } else{
             this.setState({
                 pen: false
