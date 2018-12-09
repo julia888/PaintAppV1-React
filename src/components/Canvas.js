@@ -1,63 +1,91 @@
-import React, { Component } from 'react'
+import React, {Component} from 'react'
 
 class Canvas extends Component {
     constructor(props) {
         super(props);
         this.onMouseDown = this.onMouseDown.bind(this);
         this.onMouseMove = this.onMouseMove.bind(this);
-        // this.onMouseUp = this.onMouseUp.bind(this);
+        this.onMouseUp = this.onMouseUp.bind(this);
+        this.state = {
+            pressed: false
+        }
     }
 
-    canvas () {
+    canvas() {
         return document.querySelector("#draw");
     }
-    ctx () {
+
+    ctx() {
         return this.canvas().getContext("2d");
     }
 
-    componentDidMount(){
-        const ctx = this.ctx();
-        ctx.lineWidth = this.props.size;
-        ctx.lineJoin = 'round';
-        ctx.lineCap = 'round';
-    }
-
     onMouseDown(event) {
-        console.log('down');
+        this.setState({
+            pressed:true
+        });
         let color = this.props.color;
         const ctx = this.ctx();
         const canvas = this.canvas();
         const {top, left} = canvas.getBoundingClientRect();
         let s = this.props.size;
         let figure = this.props.figure;
-        ctx.fillStyle = color;
-        if (figure === 'rectangle'){
-            //квадрат
-            ctx.fillRect(event.clientX-left, event.clientY-top, s, s);
-        } else if (figure === 'circle') {
-            //круг
-            let circleF = new Path2D();
-            circleF.arc(event.clientX-left, event.clientY-top, s, 0, 2 * Math.PI);
-            ctx.fill(circleF);
+        let x = event.clientX - left;
+        let y = event.clientY - top;
+
+        if (this.props.pen === false) {
+            ctx.fillStyle = color;
+            if (figure === 'rectangle') {
+                //квадрат
+                ctx.fillRect(x, y, s, s);
+            } else if (figure === 'circle') {
+                //круг
+                let circleF = new Path2D();
+                circleF.arc(x, y, s, 0, 2 * Math.PI);
+                ctx.fill(circleF);
+            } else {
+                s = s / 5;
+                //шестиугольник
+                ctx.beginPath();
+                ctx.moveTo(x, y);
+                ctx.lineTo(x + 5 * s, y + 7 * s);
+                ctx.lineTo(x + 12 * s, y + 7 * s);
+                ctx.lineTo(x + 17 * s, y);
+                ctx.lineTo(x + 12 * s, y - 7 * s);
+                ctx.lineTo(x + 5 * s, y - 7 * s);
+                ctx.fill();
+            }
         } else {
-            s = s/5;
-            //шестиугольник
+            ctx.lineJoin = 'round';
+            ctx.lineCap = 'round';
             ctx.beginPath();
-            ctx.moveTo(event.clientX-left, event.clientY-top);
-            ctx.lineTo(event.clientX-left + 5 * s, event.clientY-top + 7 * s);
-            ctx.lineTo(event.clientX-left + 12 * s, event.clientY-top + 7 * s);
-            ctx.lineTo(event.clientX-left + 17 * s, event.clientY-top);
-            ctx.lineTo(event.clientX-left + 12 * s, event.clientY-top - 7 * s);
-            ctx.lineTo(event.clientX-left + 5 * s, event.clientY-top - 7 * s);
-            ctx.fill();
+            ctx.moveTo(x, y);
+            this.onMouseMove(event, canvas, ctx, color, s);
         }
     }
-    onMouseMove(event){
-        console.log('move')
+
+    onMouseMove(event) {
+        let color = this.props.color;
+        const ctx = this.ctx();
+        const canvas = this.canvas();
+        const {top, left} = canvas.getBoundingClientRect();
+        let s = this.props.size;
+        this.props.updateCoordinates([event.clientX - left, event.clientY - top +0.875 ]);
+        if (this.state.pressed === true && this.props.pen === true) {
+            ctx.lineWidth = s;
+            let x = event.clientX - left;
+            let y = event.clientY - top;
+            ctx.lineTo(x, y);
+            ctx.stroke();
+            ctx.strokeStyle = color;
+        }
     }
-    onMouseUp(event){
-        console.log('up')
+
+    onMouseUp(event) {
+        this.setState({
+            pressed:false
+        });
     }
+
     render() {
         return (
             <div>
@@ -66,7 +94,7 @@ class Canvas extends Component {
                         width={'700px'}
                         height={'350px'}
                         onMouseDown={this.onMouseDown}
-                        onMouseMove={ this.onMouseMove}
+                        onMouseMove={this.onMouseMove}
                         onMouseUp={this.onMouseUp}
                 />
             </div>
