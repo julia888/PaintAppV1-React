@@ -1,6 +1,10 @@
 import React, {Component} from 'react'
 import Canvas from './Canvas';
 import Footer from './Footer';
+import Color from './Color';
+import Figure from './Figure';
+import Pen from './Pen';
+import Size from './Size';
 class Controls extends Component {
     constructor(props) {
         super(props);
@@ -39,7 +43,6 @@ class Controls extends Component {
                 pen: false
             })
         }
-        console.log(this.state.pen)
     };
     updateCoordinates = (value) => {
         this.setState({
@@ -49,23 +52,10 @@ class Controls extends Component {
     render() {
         return (
             <div>
-                <p>Color</p>
-                <input type="text" className={'input-color'} onKeyPress={this.changeColor}/>
-                <p>Figure</p>
-                <select className={"selectFigure"}
-                        onChange={this.changeFigure}>
-                    <option className={"rectangle"} value={"rectangle"}>rectangle</option>
-                    <option className={"circle"} value={"circle"}>circle</option>
-                    <option className={"hexagon"} value={"hexagon"}>hexagon</option>
-                </select>
-                <button type="button" className={"pen"}
-                        onClick={this.changePenState}
-                        style={{backgroundColor: this.state.pen === true ? 'red' : ''}}>Pen</button>
-                <p>Size</p>
-                <input type="range" className={"size"} min={'0'} max={'100'} step={'1'}
-                       onChange={this.changeSize}
-                       value={this.state.size}
-                />
+                <Color changeColor={this.changeColor}/>
+                <Figure changeFigure={this.changeFigure}/>
+                <Pen changePenState={this.changePenState} pen={this.state.pen}/>
+                <Size changeSize={this.changeSize} size={this.state.size}/>
                 <Canvas size={this.state.size}
                         figure={this.state.figure}
                         color={this.state.color}
@@ -74,7 +64,6 @@ class Controls extends Component {
                 />
                 <Footer coordinates={this.state.coordinates}/>
             </div>
-
         )
     }
 }
